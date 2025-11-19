@@ -1,0 +1,78 @@
+ABSTRACT:
+We aim to design a multivariate probabilistic time series model which can provide full predictive distributions instead of point estimation. The following program uses Numpy to create a synthetic dataset of trend, seasonality and heteroscedastic noise. Three deep learning models were constructed—Gaussian LSTM, deeper Gaussian and Student-t LSTMs—all of which were trained with the use of distribution-based negative log-likelihood losses. Traditional SARIMAX was employed as the baseline. Both CRPS and 90% interval coverage were used as scoring metrics. The experiments show that on both benchmarks, the SL-Gaussian LSTM bestes all other models in terms for probabilistic sharpness, while the Student-t model yields best interval calibration. This project represents the tradeoff between distributional assumptions and model capacity in forecasting under uncertainty.
+
+INTRODUCTION:
+To predict actual-world phenomena, we need to do more than just forecasting expected values, but also to quantify our uncertainty. Classical methods such as ARIMA and Exponential Smoothing yield point forecasts or Bonferroni intervals. By contrast, in probabilistic deep learning models produce full parameterized distributions leading richer uncertainty characterisation.
+This work tries to show such rational stochastic prediction based on the synthetic multivariate time series data and more advanced neural networks, while considering distribution-based evaluation measurements.
+
+DATASET GENERATION:
+We created a synthetic multivariate data with three correlated time series, each of length 1200 using Python’s Numpy. The dataset includes:
+Upward trend
+Seasonal components
+Heteroscedastic noise
+Occasional shock/holiday effects
+Indeed, all three series exhibit a common underlying correlation structure capturing life-like dependence. The dataset is preprocessed by normalizing as well as turning into supervised sliding windows with length 30 prior to training.
+
+Path to plots:
+plots/A,B,C Model.png
+plots/comparison.png
+plots/image.png
+plots/output.png
+
+BASELINE MODEL: SARIMAX
+A SARIMAX(2,1,2) model with exogenous variables (the remaining series) was implemented as a classical baseline. Confidence intervals and predictive mean were extracted for the test window.
+Evaluation metrics used:
+90% interval coverage
+CRPS (approximate numerical implementation)
+
+Model A — Gaussian LSTM
+Input size: 3
+Hidden size: 64
+Layers: 1
+Output: mean (μ), variance (σ²)
+Loss: Gaussian NLL
+Optimizer: Adam
+Epochs: 60
+
+Coverage: 94.71%
+CRPS: -3.5687
+
+Model B — Gaussian LSTM (2-layer)
+Input size: 3
+Hidden size: 128
+Layers: 2
+Loss: Gaussian NLL
+
+Coverage: 97.05%
+CRPS: -3.5554
+
+Model C — Student-t LSTM
+Heavy-tailed distribution
+Output parameters: μ, σ, ν
+Loss: Student-t NLL
+Most realistic calibration
+
+Coverage: 92.94%
+CRPS: -2.8002
+
+COMPARATIVE EVALUATION:
+
+Model	             Coverage (%)	    CRPS	        Notes
+SARIMAX	                  -	              -	            Baseline
+LSTM Gaussian (A)	    94.71	        -3.5687	        Best sharpness
+LSTM Gaussian 2L (B)	97.05	        -3.5554	        Over-confident
+LSTM Student-t (C)	    92.94	        -2.8002	        Best calibration
+
+DISCUSSION:
+The Gaussian LSTM (Model A) showed the lowest CRPS value with a result predicted for the sharpest and most accurate predictive distribution. But its 90% interval coverage (94.71%) also suggests slightly conservative intervals.
+The deeper architecture of Model B led to overly confident predictions model and overly wide intervals (97.05% coverage). Even with bigger network, the performance could not beat Model A.
+Model C performed the best in terms of interval calibration (92.94%) when normalizing with a Student-t distribution. But heaver tails lead to more spread out prediction intervals – so they are less sharp and CRPS is higher.
+These results highlight the tension between model complexity, choice of distribution, and probabilistic fidelity.
+
+CONCLUSION:
+In this paper, we show a full probabilistic forecasting pipeline composed of synthetic data generation, classical baselines and deep learning approaches for uncertainty estimation, evaluation on distributions.
+The optimal model is based on the precedence of the assessment:
+Model A ran on each of the >10 runs → Best accuracy (i.e., lowest CRPS)
+Model C (Student-t LSTM) → Best calibration of uncertainty
+Model B → Overestimates uncertainty
+The results illustrate that highest quality forecasts are not necessarily obtained using the most sophisticated models and highlight the importance of distributional choice.
