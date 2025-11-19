@@ -58,7 +58,7 @@ CRPS: -2.8002
 COMPARATIVE EVALUATION:
 
 Model	             Coverage (%)	    CRPS	        Notes
-SARIMAX	                  -	              -	            Baseline
+SARIMAX	                99.00	        -21.59	        Baseline
 LSTM Gaussian (A)	    94.71	        -3.5687	        Best sharpness
 LSTM Gaussian 2L (B)	97.05	        -3.5554	        Over-confident
 LSTM Student-t (C)	    92.94	        -2.8002	        Best calibration
